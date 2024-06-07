@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 const (
 	englishHelloPrefix = "Hello, "
 	spanishHelloPrefix = "Hola, "
@@ -10,10 +8,6 @@ const (
 	spanish = "Spanish"
 	french  = "French"
 )
-
-func main() {
-	fmt.Println(Hello("Chris", "Spanish"))
-}
 
 func Hello(name, lang string) string {
 	if name == "" {
