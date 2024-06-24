@@ -2,6 +2,7 @@ package arraysslices
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -56,22 +57,90 @@ func TestReduce(t *testing.T) {
 }
 
 func TestBadBank(t *testing.T) {
-	transactions := []Transaction{
-		{
-			From: "Chris",
-			To:   "Riya",
-			Sum:  100,
-		},
-		{
-			From: "Adil",
-			To:   "Chris",
-			Sum:  25,
-		},
+	var (
+		riya  = Account{Name: "Riya", Balance: 100}
+		chris = Account{Name: "Chris", Balance: 75}
+		adil  = Account{Name: "Adil", Balance: 200}
+
+		transactions = []Transaction{
+			NewTransaction(chris, riya, 100),
+			NewTransaction(adil, chris, 25),
+		}
+	)
+	newBalanceFor := func(account Account) float64 {
+		return NewBalanceFor(account, transactions).Balance
 	}
 
-	AssertEqual(t, BalanceFor(transactions, "Riya"), 100)
-	AssertEqual(t, BalanceFor(transactions, "Chris"), -75)
-	AssertEqual(t, BalanceFor(transactions, "Adil"), -25)
+	AssertEqual(t, newBalanceFor(riya), 200)
+	AssertEqual(t, newBalanceFor(chris), 0)
+	AssertEqual(t, newBalanceFor(adil), 175)
+}
+
+func TestFind(t *testing.T) {
+	t.Run("find first even number", func(t *testing.T) {
+		numbers := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+		firstEvenNumber, found := Find(numbers, func(x int) bool {
+			return x%2 == 0
+		})
+		AssertTrue(t, found)
+		AssertEqual(t, firstEvenNumber, 2)
+	})
+	type Person struct {
+		Name string
+	}
+
+	t.Run("Find the best programmer", func(t *testing.T) {
+		people := []Person{
+			{Name: "Kent Beck"},
+			{Name: "Martin Fowler"},
+			{Name: "Chris James"},
+		}
+
+		king, found := Find(people, func(p Person) bool {
+			return strings.Contains(p.Name, "Chris")
+		})
+
+		AssertTrue(t, found)
+		AssertEqual(t, king, Person{Name: "Chris James"})
+	})
+	t.Run("filter accounts base on balance", func(t *testing.T) {
+		accounts := []Account{
+			{Name: "a", Balance: 10},
+			{Name: "b", Balance: 12},
+			{Name: "c", Balance: 13},
+			{Name: "d", Balance: 14},
+		}
+		got := Filter(accounts, func(a Account) bool {
+			return a.Balance > 12
+		})
+		want := []Account{{Name: "c", Balance: 13}, {Name: "d", Balance: 14}}
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("want %+v but got %+v", want, got)
+		}
+	})
+	t.Run("All balance are above some value", func(t *testing.T) {
+		accounts := []Account{
+			{Name: "b", Balance: 15},
+			{Name: "c", Balance: 13},
+			{Name: "d", Balance: 14},
+		}
+		got := All(accounts, func(a Account) bool {
+			return a.Balance > 12
+		})
+		AssertTrue(t, got)
+	})
+	t.Run("map collection of A to collection B", func(t *testing.T) {
+		data := []string{"a", "b", "c", "c"}
+
+		got := Map(data, func(st string) string {
+			return strings.ToUpper(st)
+		})
+		want := []string{"A", "B", "C", "C"}
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("got %+v but want %+v", got, want)
+		}
+	})
 }
 func checkSums(t testing.TB, got, expected []int) {
 	t.Helper()
@@ -84,5 +153,11 @@ func AssertEqual[T comparable](t testing.TB, got, want T) {
 	t.Helper()
 	if got != want {
 		t.Errorf("got %+v, want %+v", got, want)
+	}
+}
+func AssertTrue(t testing.TB, got bool) {
+	t.Helper()
+	if !got {
+		t.Errorf("got %v, want true", got)
 	}
 }
