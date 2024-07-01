@@ -11,13 +11,16 @@ import (
 	"time"
 )
 
-func StartDockerServer(t testing.TB, port, dockerFilePath string) {
+func StartDockerServer(t testing.TB, port, binToBuild string) {
 	ctx := context.Background()
 
 	req := testcontainers.ContainerRequest{
 		FromDockerfile: testcontainers.FromDockerfile{
 			Context:    "../../.",
-			Dockerfile: dockerFilePath,
+			Dockerfile: "Dockerfile",
+			BuildArgs: map[string]*string{
+				"bin_to_build": &binToBuild,
+			},
 			// set to false if you want less spam, but this is helpful if you're having troubles
 			PrintBuildLog: true,
 		},
