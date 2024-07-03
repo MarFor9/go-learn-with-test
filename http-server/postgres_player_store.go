@@ -14,6 +14,11 @@ type PostgresPlayerStore struct {
 	conn     *pgx.Conn
 }
 
+func (p *PostgresPlayerStore) GetLeague() []Player {
+	//TODO implement me
+	panic("implement me")
+}
+
 func NewPostgresPlayerStore() *PostgresPlayerStore {
 	postgresStore := &PostgresPlayerStore{storage: StartPostgresContainer()}
 	postgresStore.createTable()
