@@ -22,10 +22,15 @@ func TestRecordingWinsAndRetrievingThem(t *testing.T) {
 	players := []Player{
 		{"Pepper", 3},
 	}
+	database, cleanDatabase := createTempFile(t, `[]`)
+	defer cleanDatabase()
+	store, err := NewFileSystemPlayerStore(database)
+	assertNoError(t, err)
+
 	for _, tc := range []testConfig{
 		{
 			name:  "InMemoryPlayerStore",
-			store: NewInMemoryPlayerStore(),
+			store: store,
 			want:  players,
 		},
 		//{

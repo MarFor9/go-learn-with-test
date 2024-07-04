@@ -14,7 +14,7 @@ type PostgresPlayerStore struct {
 	conn     *pgx.Conn
 }
 
-func (p *PostgresPlayerStore) GetLeague() []Player {
+func (p *PostgresPlayerStore) GetLeague() League {
 	//TODO implement me
 	panic("implement me")
 }

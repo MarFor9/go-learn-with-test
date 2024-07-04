@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -15,7 +14,7 @@ type StubPlayerStore struct {
 	league   []Player
 }
 
-func (s *StubPlayerStore) GetLeague() []Player {
+func (s *StubPlayerStore) GetLeague() League {
 	return s.league
 }
 
@@ -126,12 +125,11 @@ func assertLeague(t testing.TB, got []Player, wantedLeague []Player) {
 
 func getLeagueFromResponse(t testing.TB, response *httptest.ResponseRecorder) []Player {
 	t.Helper()
-	var got []Player
-	err := json.NewDecoder(response.Body).Decode(&got)
+	league, err := NewLeague(response.Body)
 	if err != nil {
 		t.Fatalf("Unable to parse response from server %q into slice of Player, '%v'", response.Body, err)
 	}
-	return got
+	return league
 }
 
 func assertEqual[T comparable](t testing.TB, got T, want T) {
