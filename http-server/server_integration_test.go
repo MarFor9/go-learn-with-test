@@ -1,4 +1,4 @@
-package main
+package poker
 
 import (
 	"fmt"
@@ -51,16 +51,16 @@ func TestRecordingWinsAndRetrievingThem(t *testing.T) {
 			request, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/players/%s", player), nil)
 			server.ServeHTTP(response, request)
 
-			assertEqual(t, response.Code, http.StatusOK)
-			assertEqual(t, response.Body.String(), "3")
+			AssertEqual(t, response.Code, http.StatusOK)
+			AssertEqual(t, response.Body.String(), "3")
 
 			request, _ = http.NewRequest(http.MethodGet, "/league", nil)
 			response = httptest.NewRecorder()
 			server.ServeHTTP(response, request)
-			assertEqual(t, response.Code, http.StatusOK)
+			AssertEqual(t, response.Code, http.StatusOK)
 
-			got := getLeagueFromResponse(t, response)
-			assertLeague(t, got, tc.want)
+			got := GetLeagueFromResponse(t, response)
+			AssertLeague(t, got, tc.want)
 		})
 	}
 }
